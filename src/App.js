@@ -11,7 +11,7 @@ function App() {
   console.log('input '+ input);
   
   const sendMessage = (event) => {
-
+//
     
   //all logic to send message
     setMessages([...messages], input);
