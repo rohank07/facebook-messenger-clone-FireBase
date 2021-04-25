@@ -4,6 +4,7 @@ import { FormControl , Button, InputLabel, Input} from '@material-ui/core';
 import Message from './Message';
 import {db} from './firebase';
 import firebase from 'firebase';
+import FlipMove from 'react-flip-move';
 
 function App() {
 
@@ -16,7 +17,6 @@ function App() {
     //if its blank, this code runs on launchs only once
     setUsername(prompt('Please enter your name:'));
     
-
     }  
   , []) // condition
 
@@ -24,9 +24,9 @@ function App() {
   useEffect(()=>{
     // run once when the app component loads
       db.collection('messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-      setMessages(snapshot.docs.map(doc => doc.data())) // returns a object
-    })
-  },[])
+      setMessages(snapshot.docs.map(doc => ({ id: doc.id, message: doc.data()}))) // returns a object
+    });
+  },[]);
 
   const sendMessage = (event) => {
     //forms refresh on submit
@@ -45,22 +45,27 @@ function App() {
 
   return (
     <div className="App">
+      <img src = "https://facebookbrand.com/wp-content/uploads/2020/10/Logo_Messenger_NewBlurple-399x399-1.png?w=150&h=150"/>
       <h1>Facebook Messenger</h1>
       <h2>Hello {username}!</h2>
-  <form>
-    <FormControl>
-      <InputLabel>Enter Message</InputLabel>
-      <Input value = {input} onChange = {event => setInput(event.target.value)} aria-describedby="my-helper-text" />
-      <Button variant = 'contained'  color = 'primary' type= 'submit' disabled= {!input} onClick = {sendMessage}>Send message</Button>
-    </FormControl>
-  </form>
-    {
-      messages.map(message => 
-        
-        <Message username = {username} message = {message}/>)
-    }
+      <form className ="app__form">
+        <FormControl>
+          <InputLabel>Enter Message</InputLabel>
+          <Input value = {input} onChange = {event => setInput(event.target.value)} aria-describedby="my-helper-text" />
+          <Button variant = 'contained'  color = 'primary' type= 'submit' disabled= {!input} onClick = {sendMessage}>Send message</Button>
+        </FormControl>
+      </form>
+
+      <FlipMove>
+        {
+            messages.map(({id ,message}) => 
+            //add a key to only render the newest message, not the entire message list
+            // key is necessary in rendering lists, it knows that nothing was changed with other elements. It does not render it.
+            <Message key= {id} username = {username} message = {message}/>)
+        }
+        </FlipMove>
     </div>
- 
+    
   );
 }
 
